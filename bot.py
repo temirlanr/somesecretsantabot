@@ -19,9 +19,9 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 
-mc_id = "-743252633"
+mc_id = -743252633
 
-WISHLIST = range(1)
+WISHLIST, NAME = range(2)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 
@@ -41,7 +41,18 @@ def wishlist(update: Update, context: CallbackContext) -> int:
 def wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
-    logger.info("User %s wants: %s", user.first_name, update.message.text)
+    logger.info("User %s wants: %s", user.username, update.message.text)
+    cur.execute(f"INSERT INTO main_info (user_id, username, wishlist) VALUES ({user.id}, {user.username}, {update.message.text})")
+    update.message.reply_text('Now tell me how to call you!')
+
+    return NAME
+
+
+def define_name(update: Update, context: CallbackContext) -> int:
+
+    user = update.message.from_user
+    logger.info("User %s is called %s", user.username, update.message.text)
+    cur.execute(f"INSERT INTO main_info (name) VALUES ({update.message.text})")
     update.message.reply_text('You for sure will get an amazing present from santa!')
 
     return ConversationHandler.END
