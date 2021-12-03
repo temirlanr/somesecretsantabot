@@ -42,7 +42,7 @@ def wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
     logger.info("User %s wants: %s", user.username, update.message.text)
-    cur.execute(f"INSERT INTO main_info VALUES ({user.id}, {user.username}, {'NULL'}, {update.message.text});")
+    cur.execute(f"INSERT INTO main_info VALUES ({user.id}, {str(user.username)}, {'NULL'}, {update.message.text});")
     update.message.reply_text('Now tell me how to call you!')
 
     return NAME
