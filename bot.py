@@ -97,6 +97,7 @@ def main():
                                        entry_points=[CommandHandler('wishlist', wishlist)],
                                        states={
                                            WISHLIST: [MessageHandler(Filters.text, wishlist_handler)],
+                                           NAME: [MessageHandler(Filters.text, define_name)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
                                        ))
