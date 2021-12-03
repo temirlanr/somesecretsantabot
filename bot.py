@@ -42,7 +42,7 @@ def wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
     logger.info("User %s wants: %s", user.username, update.message.text)
-    cur.execute(f"INSERT INTO main_info (user_id, username, wishlist) VALUES ({user.id}, {user.username}, {update.message.text})")
+    cur.execute(f"INSERT INTO main_info (user_id, username, wishlist) VALUES ({user.id}, {str(user.username)}, {str(update.message.text)})")
     update.message.reply_text('Now tell me how to call you!')
 
     return NAME
@@ -52,7 +52,7 @@ def define_name(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
     logger.info("User %s is called %s", user.username, update.message.text)
-    cur.execute(f"INSERT INTO main_info (name) VALUES ({update.message.text})")
+    cur.execute(f"INSERT INTO main_info (name) VALUES ({str(update.message.text)})")
     update.message.reply_text('You for sure will get an amazing present from santa!')
 
     return ConversationHandler.END
