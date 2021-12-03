@@ -18,12 +18,6 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
-cur.execute("""CREATE TABLE [IF NOT EXISTS] rat_hole (
-                    user_id serial PRIMARY KEY, 
-                    username VARCHAR(50) UNIQUE NOT NULL,
-                    name VARCHAR(50),
-                    wishlist VARCHAR(500)
-                    );""")
 
 mc_id = "-743252633"
 
