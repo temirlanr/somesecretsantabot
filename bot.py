@@ -40,7 +40,8 @@ def wishlist(update: Update, context: CallbackContext) -> int:
 
 def wishlist_handler(update: Update, context: CallbackContext) -> int:
 
-
+    user = update.message.from_user
+    logger.info("User %s wants: %s", user.first_name, update.message.text)
     update.message.reply_text('You for sure will get an amazing present from santa!')
 
     return ConversationHandler.END
@@ -82,7 +83,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(ConversationHandler(
-                                       entry_points=[CommandHandler('suggestion', wishlist)],
+                                       entry_points=[CommandHandler('wishlist', wishlist)],
                                        states={
                                            WISHLIST: [MessageHandler(Filters.text, wishlist_handler)],
                                        },
