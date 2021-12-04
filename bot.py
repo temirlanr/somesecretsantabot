@@ -82,37 +82,51 @@ def shuffle(update: Update, context: CallbackContext) -> int:
         ),
     )
     
-    return CONFIRMATION
-
-
-def confirmation(update: Update, context: CallbackContext) -> int:
-
-    if update.message.text=='No':
-        update.message.reply_text('No means No', reply_markup=ReplyKeyboardRemove(),)
-        return ConversationHandler.END
-
-    update.message.reply_text('Confirmed!', reply_markup=ReplyKeyboardRemove(),)
     return SHUFFLE
 
 
 def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
+    if update.message.text=='No':
+        update.message.reply_text('No means No', reply_markup=ReplyKeyboardRemove(),)
+        return ConversationHandler.END
+
     cur.execute(f"select user_id from main;")
-    users = cur.fetchall()
+    l = cur.fetchall()
     
-    if len(users)<=2:
+    if len(l)<=2:
         update.message.reply_text('No people to play with :(')
         return ConversationHandler.END
     
-    temp = [item for item in users]
+    try:
 
-    for element in users:
-        if element in temp:
-            temp.remove(element)
-        shuffle = random.choice(temp)
-        temp.append(element)
-        temp.remove(shuffle)
-        cur.execute(f"insert into shuffle values ('{element[0]}', '{shuffle[0]}');")
+        temp = [n for n in l]
+        for i in range(len(l)):
+            if l[i] in temp:
+                temp.remove(l[i])
+                shuffle = random.choice(temp)
+                temp.remove(shuffle)
+                temp.append(l[i])
+            else:
+                shuffle = random.choice(temp)
+                temp.remove(shuffle)
+            cur.execute(f"insert into shuffle values ('{l[i][0]}', '{shuffle[0]}');")
+    except IndexError:
+        cur.execute("TRUNCATE TABLE shuffle;")
+        temp = [n for n in l]
+        for i in range(len(l)):
+            if i==0:
+                shuffle = (5,)
+                temp.remove(shuffle)
+            elif l[i] in temp:
+                temp.remove(l[i])
+                shuffle = random.choice(temp)
+                temp.remove(shuffle)
+                temp.append(l[i])
+            else:
+                shuffle = random.choice(temp)
+                temp.remove(shuffle)
+            cur.execute(f"insert into shuffle values ('{l[i][0]}', '{shuffle[0]}');")
 
     conn.commit()
 
@@ -167,7 +181,6 @@ def main():
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('shuffle', shuffle)],
                                        states={
-                                           CONFIRMATION: [MessageHandler(Filters.regex('^(Yes|No)$'), confirmation)],
                                            SHUFFLE: [MessageHandler(Filters.chat(mc_id), shuffle_handler)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
