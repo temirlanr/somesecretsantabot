@@ -83,6 +83,7 @@ def shuffle(update: Update, context: CallbackContext) -> int:
     )
 
     if update.message.text=='No':
+        update.message.reply_text('No means No', reply_markup=ReplyKeyboardRemove(),)
         return ConversationHandler.END
     
     return SHUFFLE
