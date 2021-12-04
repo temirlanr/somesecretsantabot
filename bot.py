@@ -1,6 +1,7 @@
 import logging
 import os
 import psycopg2
+import random
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, conversationhandler
@@ -21,7 +22,7 @@ cur = conn.cursor()
 
 mc_id = -743252633
 
-WISHLIST, NAME = range(2)
+WISHLIST, NAME, SHUFFLE = range(3)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 
@@ -70,6 +71,46 @@ def define_name(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 
+def shuffle(update: Update, context: CallbackContext) -> int:
+
+    reply_keyboard = [['Yes', 'No']]
+
+    update.message.reply_text(
+        'So we need to pick a chat where everyone is present and I can start shuffling and you can see it.\n',
+        reply_markup=ReplyKeyboardMarkup(
+            reply_keyboard, one_time_keyboard=True, input_field_placeholder='Do you wish to set this chat as main?'
+        ),
+    )
+
+    return SHUFFLE
+
+
+def shuffle_handler(update: Update, context: CallbackContext) -> int:
+
+    cur.execute(f"select user_id from main;")
+    users = cur.fetchall()
+    
+    if len(users)<=1:
+        update.message.reply_text('No people to play with :(')
+        return ConversationHandler.END
+    
+    temp = [item for item in users]
+
+    for element in users:
+        if element in temp:
+            temp.remove(element)
+        shuffle = random.choice(temp)
+        temp.append(element)
+        temp.remove(shuffle)
+        cur.execute(f"insert into shuffle values ('{element[0]}', '{shuffle[0]}');")
+
+    conn.commit()
+
+    update.message.reply_text('Done shuffling!')
+
+    return ConversationHandler.END
+
+
 def cancel(update: Update, context: CallbackContext) -> int:
     """Cancels and ends the conversationn."""
     user = update.message.from_user
@@ -110,6 +151,13 @@ def main():
                                        states={
                                            WISHLIST: [MessageHandler(Filters.text, wishlist_handler)],
                                            NAME: [MessageHandler(Filters.text, define_name)],
+                                       },
+                                       fallbacks=[CommandHandler('cancel', cancel)],
+                                       ))
+    dp.add_handler(ConversationHandler(
+                                       entry_points=[CommandHandler('shuffle', shuffle)],
+                                       states={
+                                           SHUFFLE: [MessageHandler(Filters.chat(mc_id), shuffle_handler)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
                                        ))
