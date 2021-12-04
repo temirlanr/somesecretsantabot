@@ -38,6 +38,7 @@ def delete_me(update: Update, context: CallbackContext) -> int:
     try:
         cur.execute(f"DELETE FROM main WHERE user_id={user.id};")
         conn.commit()
+        update.message.reply_text('Done.')
     except Exception:
         update.message.reply_text('I could not find you...')
 
