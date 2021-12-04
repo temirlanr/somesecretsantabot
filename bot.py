@@ -42,7 +42,7 @@ def update_wishlist(update: Update, context: CallbackContext) -> int:
 def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
-    cur.execute(f"UPDATE TABLE main SET wishlist='{update.message.text}' WHERE user_id={user.id};")
+    cur.execute(f"UPDATE main SET wishlist='{update.message.text}' WHERE user_id={user.id};")
     conn.commit()
 
     update.message.reply_text('Got it!')
