@@ -4,7 +4,7 @@ import psycopg2
 import random
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, conversationhandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -22,7 +22,7 @@ cur = conn.cursor()
 
 mc_id = -743252633
 
-WISHLIST, NAME, SHUFFLE, CONFIRMATION = range(4)
+WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 
@@ -30,6 +30,24 @@ WISHLIST, NAME, SHUFFLE, CONFIRMATION = range(4)
 def start(update, context):
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
+
+
+def update_wishlist(update: Update, context: CallbackContext) -> int:
+
+    update.message.reply_text('What do you want from Santa?')
+
+    return UPDATE_WISHLIST
+
+
+def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
+
+    user = update.message.from_user
+    cur.execute(f"UPDATE TABLE main SET wishlist='{update.message.text}' WHERE user_id={user.id};")
+    conn.commit()
+
+    update.message.reply_text('Got it!')
+
+    return ConversationHandler.END
 
 
 def wishlist(update: Update, context: CallbackContext) -> int:
@@ -42,7 +60,13 @@ def wishlist(update: Update, context: CallbackContext) -> int:
 def wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
-    logger.info("User %s wants: %s", user.username, update.message.text)
+    
+    try:
+        cur.execute(f"DELETE FROM main WHERE user_id={user.id};")
+        conn.commit()
+    except Exception:
+        pass
+    
     try:
         cur.execute(f"INSERT INTO main VALUES ({user.id}, '{str(user.username)}', '{update.message.text}');")
         conn.commit()
@@ -183,6 +207,13 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(ConversationHandler(
+                                       entry_points=[CommandHandler('update_wishlist', update_wishlist)],
+                                       states={
+                                           UPDATE_WISHLIST: [MessageHandler(Filters.text, update_wishlist_handler)],
+                                       },
+                                       fallbacks=[CommandHandler('cancel', cancel)],
+                                       ))
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('wishlist', wishlist)],
                                        states={
