@@ -82,6 +82,9 @@ def shuffle(update: Update, context: CallbackContext) -> int:
         ),
     )
 
+    if update.message.text=='No':
+        return ConversationHandler.END
+    
     return SHUFFLE
 
 
@@ -90,8 +93,8 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     cur.execute(f"select user_id from main;")
     users = cur.fetchall()
     
-    if len(users)<=1:
-        update.message.reply_text('No people to play with :(')
+    if len(users)<=2:
+        update.message.reply_text('No people to play with :(', reply_markup=ReplyKeyboardRemove(),)
         return ConversationHandler.END
     
     temp = [item for item in users]
@@ -106,7 +109,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     conn.commit()
 
-    update.message.reply_text('Done shuffling!')
+    update.message.reply_text('Done shuffling!', reply_markup=ReplyKeyboardRemove(),)
 
     return ConversationHandler.END
 
