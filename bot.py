@@ -32,6 +32,16 @@ def start(update, context):
     update.message.reply_text('Hi!')
 
 
+def delete_me(update: Update, context: CallbackContext) -> int:
+    
+    user = update.message.from_user
+    try:
+        cur.execute(f"DELETE FROM main WHERE user_id={user.id};")
+        conn.commit()
+    except Exception:
+        update.message.reply_text('I could not find you...')
+
+
 def update_wishlist(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text('What do you want from Santa?')
@@ -207,6 +217,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("delete_me", delete_me))
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('update_wishlist', update_wishlist)],
                                        states={
