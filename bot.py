@@ -90,6 +90,8 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     if update.message.text=='No':
         update.message.reply_text('No means No', reply_markup=ReplyKeyboardRemove(),)
         return ConversationHandler.END
+    
+    update.message.reply_text('Starting then...', reply_markup=ReplyKeyboardRemove(),)
 
     cur.execute(f"select user_id from main;")
     l = cur.fetchall()
