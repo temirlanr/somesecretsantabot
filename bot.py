@@ -93,6 +93,8 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     
     update.message.reply_text('Starting then...', reply_markup=ReplyKeyboardRemove(),)
 
+    cur.execute(f"truncate table shuffle;")
+
     cur.execute(f"select user_id from main;")
     l = cur.fetchall()
     
@@ -142,9 +144,6 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     data = cur.fetchall()
     for element in data:
         context.bot.send_message(chat_id=element[0], text=f"You are a secret santa for {element[1]} and his wishlist is: {element[2]}")
-
-    cur.execute(f"truncate table shuffle;")
-    conn.commit()
 
     return ConversationHandler.END
 
