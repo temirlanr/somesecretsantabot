@@ -144,6 +144,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
         context.bot.send_message(chat_id=element[0], text=f"You are a secret santa for {element[1]} and his wishlist is: {element[2]}")
 
     cur.execute(f"truncate table shuffle;")
+    conn.commit()
 
     return ConversationHandler.END
 
