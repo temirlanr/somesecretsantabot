@@ -134,6 +134,15 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text('Done shuffling!')
 
+    cur.execute("""select s.user_id, m.name, m.wishlist
+                    from shuffle as s
+                    inner JOIN main as m
+                    on s.is_santa_for=m.user_id;""")
+
+    data = cur.fetchall()
+    for element in data:
+        context.bot.send_message(chat_id=element[0], text=f"You are a secret santa for {element[1]} and his wishlist is: {element[2]}")
+
     return ConversationHandler.END
 
 
@@ -175,7 +184,7 @@ def main():
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('wishlist', wishlist)],
                                        states={
-                                           WISHLIST: [MessageHandler(Filters.text, wishlist_handler)],
+                                           WISHLIST: [MessageHandler(Filters.text , wishlist_handler)],
                                            NAME: [MessageHandler(Filters.text, define_name)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
