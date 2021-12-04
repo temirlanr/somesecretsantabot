@@ -22,7 +22,7 @@ cur = conn.cursor()
 
 mc_id = -743252633
 
-WISHLIST, NAME, SHUFFLE = range(3)
+WISHLIST, NAME, SHUFFLE, CONFIRMATION = range(4)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 
@@ -81,11 +81,17 @@ def shuffle(update: Update, context: CallbackContext) -> int:
             reply_keyboard, one_time_keyboard=True, input_field_placeholder='Do you wish to set this chat as main?'
         ),
     )
+    
+    return CONFIRMATION
+
+
+def confirmation(update: Update, context: CallbackContext) -> int:
 
     if update.message.text=='No':
         update.message.reply_text('No means No', reply_markup=ReplyKeyboardRemove(),)
         return ConversationHandler.END
-    
+
+    update.message.reply_text('Confirmed!', reply_markup=ReplyKeyboardRemove(),)
     return SHUFFLE
 
 
@@ -95,7 +101,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     users = cur.fetchall()
     
     if len(users)<=2:
-        update.message.reply_text('No people to play with :(', reply_markup=ReplyKeyboardRemove(),)
+        update.message.reply_text('No people to play with :(')
         return ConversationHandler.END
     
     temp = [item for item in users]
@@ -110,7 +116,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     conn.commit()
 
-    update.message.reply_text('Done shuffling!', reply_markup=ReplyKeyboardRemove(),)
+    update.message.reply_text('Done shuffling!')
 
     return ConversationHandler.END
 
@@ -161,6 +167,7 @@ def main():
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('shuffle', shuffle)],
                                        states={
+                                           CONFIRMATION: [MessageHandler(Filters.regex('^(Yes|No)$'), confirmation)],
                                            SHUFFLE: [MessageHandler(Filters.chat(mc_id), shuffle_handler)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
