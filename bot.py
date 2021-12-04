@@ -42,8 +42,12 @@ def wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
     logger.info("User %s wants: %s", user.username, update.message.text)
-    cur.execute(f"INSERT INTO main VALUES ({user.id}, '{str(user.username)}', '{update.message.text}');")
-    conn.commit()
+    try:
+        cur.execute(f"INSERT INTO main VALUES ({user.id}, '{str(user.username)}', '{update.message.text}');")
+        conn.commit()
+    except Exception:
+        update.message.reply_text('Oops! Error occurred')
+        return ConversationHandler.END
     update.message.reply_text('Now tell me how to call you!')
 
     return NAME
@@ -53,8 +57,14 @@ def define_name(update: Update, context: CallbackContext) -> int:
 
     user = update.message.from_user
     logger.info("User %s is called %s", user.username, update.message.text)
-    cur.execute(f"UPDATE main SET name = '{update.message.text}' WHERE user_id = {user.id};")
-    conn.commit()
+    try:
+        cur.execute(f"UPDATE main SET name = '{update.message.text}' WHERE user_id = {user.id};")
+        conn.commit()
+    except Exception:
+        update.message.reply_text('Oops! Error occurred, try again')
+        cur.execute(f"delete from main WHERE user_id = {user.id};")
+        conn.commit()
+        return ConversationHandler.END
     update.message.reply_text('You for sure will get an amazing present from santa!')
 
     return ConversationHandler.END
