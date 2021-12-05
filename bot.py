@@ -250,7 +250,8 @@ def main():
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('wishlist', wishlist)],
                                        states={
-                                           WISHLIST: [MessageHandler(Filters.text , wishlist_handler)],
+                                           WISHLIST: [MessageHandler(Filters.text, wishlist_handler), 
+                                                      CommandHandler('skip', skip_wishlist)],
                                            NAME: [MessageHandler(Filters.text, define_name)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
