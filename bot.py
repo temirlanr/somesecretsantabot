@@ -29,7 +29,7 @@ WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text('Хаю-хай!!')
 
 
 def list(update: Update, context: CallbackContext) -> int:
@@ -76,9 +76,16 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
 def wishlist(update: Update, context: CallbackContext) -> int:
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете?")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? Если нажали по ошибке то или передумали напишите /skip")
 
-    return WISHLIST 
+    return WISHLIST
+
+
+def skip_wishlist(update: Update, context: CallbackContext) -> int:
+
+    update.message.reply_text('Понял!')
+
+    return NAME
 
 
 def wishlist_handler(update: Update, context: CallbackContext) -> int:
@@ -97,7 +104,7 @@ def wishlist_handler(update: Update, context: CallbackContext) -> int:
     except Exception:
         update.message.reply_text('Упс! Чето не то пошло')
         return ConversationHandler.END
-    update.message.reply_text('Как мне вас называть?')
+    update.message.reply_text('Как мне вас называть? Пишите с умом, по этому имени я вас назову вашему тайному санте.')
 
     return NAME
 
@@ -110,11 +117,11 @@ def define_name(update: Update, context: CallbackContext) -> int:
         cur.execute(f"UPDATE main SET name = '{update.message.text}' WHERE user_id = {user.id};")
         conn.commit()
     except Exception:
-        update.message.reply_text('Упс! Попробуйте заново')
         cur.execute(f"delete from main WHERE user_id = {user.id};")
         conn.commit()
+        update.message.reply_text('Упс! Попробуйте заново')
         return ConversationHandler.END
-    update.message.reply_text('О Санта позаботится о том чтобы тебе дали отличный подарок!')
+    update.message.reply_text('Охохо... Санта позаботится о том чтобы тебе дали отличный подарок!')
 
     return ConversationHandler.END
 
@@ -124,7 +131,7 @@ def shuffle(update: Update, context: CallbackContext) -> int:
     reply_keyboard = [['Да', 'Нет']]
 
     update.message.reply_text(
-        'So we need to pick a chat where everyone is present and I can start shuffling and you can see it.\n',
+        'Надо выбрать чят где все могут увидеть что я шафлю...\n',
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True, input_field_placeholder='В этом чате распределять?'
         ),
@@ -184,14 +191,14 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text('Готово!')
 
-    cur.execute("""select s.user_id, m.name, m.wishlist
+    cur.execute("""select m.username, m.name, m.wishlist
                     from shuffle as s
                     inner JOIN main as m
                     on s.is_santa_for=m.user_id;""")
 
     data = cur.fetchall()
     for element in data:
-        context.bot.send_message(chat_id=element[0], text=f"Ты тайный Санта {element[1]} и он хочет: {element[2]}")
+        context.bot.send_message(chat_id=element[0], text=f"Ты тайный Санта этого человека: {element[1]} (username: {element[0]}) и он/онa хочет: {element[2]}")
 
     return ConversationHandler.END
 
