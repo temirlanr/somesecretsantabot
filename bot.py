@@ -39,7 +39,7 @@ def list(update: Update, context: CallbackContext) -> int:
         cur.execute(f"SELECT username, name FROM main;")
         participants = cur.fetchall()
         for i in range(len(participants)):
-            reply.append(f"{str(i+1)}. username: {participants[i][0]}, name: {participants[i][1]}")
+            reply.append(f"{str(i+1)}. @{participants[i][0]} ({participants[i][1]})")
         update.message.reply_text('\n'.join(reply))
     except Exception:
         update.message.reply_text('Some error occurred...')
