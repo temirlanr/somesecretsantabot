@@ -32,6 +32,18 @@ def start(update, context):
     update.message.reply_text('Hi!')
 
 
+def list(update: Update, context: CallbackContext) -> int:
+    
+    user = update.message.from_user
+    try:
+        cur.execute(f"SELECT name FROM main;")
+        conn.commit()
+        participants = cur.fetchall()
+        update.message.reply_text('\n'.join([item[0] for item in participants]))
+    except Exception:
+        update.message.reply_text('Some error occurred...')
+
+
 def delete_me(update: Update, context: CallbackContext) -> int:
     
     user = update.message.from_user
