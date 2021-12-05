@@ -76,14 +76,14 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
 def wishlist(update: Update, context: CallbackContext) -> int:
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? Если нажали по ошибке то или передумали напишите /skip")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? Если нажали по ошибке или передумали напишите /skip")
 
     return WISHLIST
 
 
 def skip_wishlist(update: Update, context: CallbackContext) -> int:
 
-    update.message.reply_text('Понял!')
+    update.message.reply_text('Понял! Тогда как мне вас называть? Пишите с умом, по этому имени я вас назову вашему тайному санте.')
 
     return NAME
 
