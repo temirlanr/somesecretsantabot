@@ -231,6 +231,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("delete_me", delete_me))
+    dp.add_handler(CommandHandler("list", list))
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('update_wishlist', update_wishlist)],
                                        states={
