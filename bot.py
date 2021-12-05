@@ -34,11 +34,9 @@ def start(update, context):
 
 def list(update: Update, context: CallbackContext) -> int:
     
-    user = update.message.from_user
     reply = []
     try:
         cur.execute(f"SELECT username, name FROM main;")
-        conn.commit()
         participants = cur.fetchall()
         for i in range(len(participants)):
             reply[i] = f'{i+1}. username: {participants[i][0]}, name: {participants[i][1]};'
