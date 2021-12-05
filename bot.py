@@ -42,7 +42,7 @@ def list(update: Update, context: CallbackContext) -> int:
             reply.append(f"{str(i+1)}. @{participants[i][0]} ({participants[i][1]})")
         update.message.reply_text('\n'.join(reply))
     except Exception:
-        update.message.reply_text('Some error occurred...')
+        update.message.reply_text('Ошибка...')
 
 
 def delete_me(update: Update, context: CallbackContext) -> int:
@@ -51,14 +51,14 @@ def delete_me(update: Update, context: CallbackContext) -> int:
     try:
         cur.execute(f"DELETE FROM main WHERE user_id={user.id};")
         conn.commit()
-        update.message.reply_text('Done.')
+        update.message.reply_text('Сделано.')
     except Exception:
-        update.message.reply_text('I could not find you...')
+        update.message.reply_text('Не нашел...')
 
 
 def update_wishlist(update: Update, context: CallbackContext) -> int:
 
-    update.message.reply_text('What do you want from Santa?')
+    update.message.reply_text('Что ты хочешь от Санты?')
 
     return UPDATE_WISHLIST
 
@@ -69,14 +69,14 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
     cur.execute(f"UPDATE main SET wishlist='{update.message.text}' WHERE user_id={user.id};")
     conn.commit()
 
-    update.message.reply_text('Got it!')
+    update.message.reply_text('Понял!')
 
     return ConversationHandler.END
 
 
 def wishlist(update: Update, context: CallbackContext) -> int:
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="What do you want from santa my dear?")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете?")
 
     return WISHLIST 
 
@@ -95,9 +95,9 @@ def wishlist_handler(update: Update, context: CallbackContext) -> int:
         cur.execute(f"INSERT INTO main VALUES ({user.id}, '{str(user.username)}', '{update.message.text}');")
         conn.commit()
     except Exception:
-        update.message.reply_text('Oops! Error occurred')
+        update.message.reply_text('Упс! Чето не то пошло')
         return ConversationHandler.END
-    update.message.reply_text('Now tell me how to call you!')
+    update.message.reply_text('Как мне вас называть?')
 
     return NAME
 
@@ -110,23 +110,23 @@ def define_name(update: Update, context: CallbackContext) -> int:
         cur.execute(f"UPDATE main SET name = '{update.message.text}' WHERE user_id = {user.id};")
         conn.commit()
     except Exception:
-        update.message.reply_text('Oops! Error occurred, try again')
+        update.message.reply_text('Упс! Попробуйте заново')
         cur.execute(f"delete from main WHERE user_id = {user.id};")
         conn.commit()
         return ConversationHandler.END
-    update.message.reply_text('You for sure will get an amazing present from santa!')
+    update.message.reply_text('О Санта позаботится о том чтобы тебе дали отличный подарок!')
 
     return ConversationHandler.END
 
 
 def shuffle(update: Update, context: CallbackContext) -> int:
 
-    reply_keyboard = [['Yes', 'No']]
+    reply_keyboard = [['Да', 'Нет']]
 
     update.message.reply_text(
         'So we need to pick a chat where everyone is present and I can start shuffling and you can see it.\n',
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, input_field_placeholder='Do you wish to set this chat as main?'
+            reply_keyboard, one_time_keyboard=True, input_field_placeholder='В этом чате распределять?'
         ),
     )
     
@@ -135,11 +135,11 @@ def shuffle(update: Update, context: CallbackContext) -> int:
 
 def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
-    if update.message.text=='No':
-        update.message.reply_text('No means No', reply_markup=ReplyKeyboardRemove(),)
+    if update.message.text=='Нет':
+        update.message.reply_text('Нет так нет', reply_markup=ReplyKeyboardRemove(),)
         return ConversationHandler.END
     
-    update.message.reply_text('Starting then...', reply_markup=ReplyKeyboardRemove(),)
+    update.message.reply_text('Начинаю...', reply_markup=ReplyKeyboardRemove(),)
 
     cur.execute(f"truncate table shuffle;")
 
@@ -147,7 +147,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     l = cur.fetchall()
     
     if len(l)<=2:
-        update.message.reply_text('No people to play with :(')
+        update.message.reply_text('Не с кем играть чета :(')
         return ConversationHandler.END
     
     try:
@@ -182,7 +182,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     conn.commit()
 
-    update.message.reply_text('Done shuffling!')
+    update.message.reply_text('Готово!')
 
     cur.execute("""select s.user_id, m.name, m.wishlist
                     from shuffle as s
@@ -191,7 +191,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     data = cur.fetchall()
     for element in data:
-        context.bot.send_message(chat_id=element[0], text=f"You are a secret santa for {element[1]} and his wishlist is: {element[2]}")
+        context.bot.send_message(chat_id=element[0], text=f"Ты тайный Санта {element[1]} и он хочет: {element[2]}")
 
     return ConversationHandler.END
 
@@ -201,7 +201,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text(
-        'Bye! I hope we can talk again some day.', reply_markup=ReplyKeyboardRemove()
+        'Пока!', reply_markup=ReplyKeyboardRemove()
     )
 
     return ConversationHandler.END
@@ -209,7 +209,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text('ПОМОГАЮ!')
 
 
 def error(update, context):
