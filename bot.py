@@ -24,7 +24,7 @@ mc_id = -743252633
 
 WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 # Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+# context. Error handlers also receive the raised TelegramError object in error
 
 
 def start(update, context):
