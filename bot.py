@@ -1,3 +1,14 @@
+"""
+TO DO:
+
+ - everything that has TEST in comments
+ - make upgrade wishlist to send updates to secret santa
+ - add command or function to drop tables or table only after everything is complete
+ - async
+ - 
+"""
+
+
 import logging
 import os
 import psycopg2
