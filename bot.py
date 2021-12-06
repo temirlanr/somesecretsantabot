@@ -2,6 +2,7 @@ import logging
 import os
 import psycopg2
 import random
+# import string / TEST
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
@@ -21,6 +22,7 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 
 mc_id = -743252633
+# table_names = {} / TEST
 
 WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 # Define a few command handlers. These usually take the two arguments update and
@@ -32,7 +34,22 @@ def start(update, context):
     update.message.reply_text('Хаю-хай!!')
 
 
-def list(update: Update, context: CallbackContext) -> int:
+# def set_as_main(update: Update, context: CallbackContext): / TEST
+
+#     global mc_id
+#     mc_id = update.effective_chat.id
+#     ran = ''.join(random.choices(string.ascii_lowercase + string.digits, k = 10))
+#     table_names[str(mc_id)] = ran
+
+#     if str(mc_id) in table_names:
+#         update.message.reply_text('Этот чат уже зарегистрирован')
+#     else:
+#         cur.execute(f"CREATE TABLE {ran}_main;")
+#         cur.execute(f"CREATE TABLE {ran}_shuffle;")
+#         conn.commit()
+
+
+def list(update: Update, context: CallbackContext):
     
     reply = []
     try:
@@ -45,7 +62,7 @@ def list(update: Update, context: CallbackContext) -> int:
         update.message.reply_text('Ошибка...')
 
 
-def delete_me(update: Update, context: CallbackContext) -> int:
+def delete_me(update: Update, context: CallbackContext):
     
     user = update.message.from_user
     try:
