@@ -175,7 +175,7 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
         temp = [n for n in l]
         for i in range(len(l)):
             if i==0:
-                shuffle = (5,)
+                shuffle = l[-1]
                 temp.remove(shuffle)
             elif l[i] in temp:
                 temp.remove(l[i])
