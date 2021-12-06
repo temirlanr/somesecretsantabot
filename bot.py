@@ -189,14 +189,14 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     conn.commit()
 
-    cur.execute("""select m.username, m.name, m.wishlist
+    cur.execute("""select s.user_id, m.name, m.wishlist, m.username
                     from shuffle as s
                     inner JOIN main as m
                     on s.is_santa_for=m.user_id;""")
 
     data = cur.fetchall()
     for element in data:
-        context.bot.send_message(chat_id=element[0], text=f"Ты тайный Санта этого человека: {element[1]} (username: {element[0]}) и он/онa хочет: {element[2]}")
+        context.bot.send_message(chat_id=element[0], text=f"Ты тайный Санта этого человека: {element[1]} (username: {element[3]}) и он/онa хочет: {element[2]}")
 
     update.message.reply_text('Готово!')
 
