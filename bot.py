@@ -58,7 +58,7 @@ def delete_me(update: Update, context: CallbackContext) -> int:
 
 def update_wishlist(update: Update, context: CallbackContext) -> int:
 
-    update.message.reply_text('Что ты хочешь от Санты?')
+    update.message.reply_text('Что ты хочешь от Санты? В любой момент вы можете вызвать команду /cancel чтобы остановить команду.')
 
     return UPDATE_WISHLIST
 
@@ -76,7 +76,7 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
 def wishlist(update: Update, context: CallbackContext) -> int:
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? Если нажали по ошибке или передумали напишите /skip или /cancel чтобы остановить команду.")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? В любой момент вы можете вызвать команду /cancel чтобы остановить команду. Если хотите оставить вишлист таким же, но хотите поменять имя напишите команду /skip.")
 
     return WISHLIST
 
@@ -86,13 +86,6 @@ def skip_wishlist(update: Update, context: CallbackContext) -> int:
     update.message.reply_text('Понял! Тогда как мне вас называть? Пишите с умом, по этому имени я вас назову вашему тайному санте.')
 
     return NAME
-
-
-def cancel_wishlist(update: Update, context: CallbackContext) -> int:
-
-    update.message.reply_text('Отменяю...')
-
-    return ConversationHandler.END
 
 
 def wishlist_handler(update: Update, context: CallbackContext) -> int:
@@ -111,7 +104,7 @@ def wishlist_handler(update: Update, context: CallbackContext) -> int:
     except Exception:
         update.message.reply_text('Упс! Чето не то пошло')
         return ConversationHandler.END
-    update.message.reply_text('Как мне вас называть? Пишите с умом, по этому имени я вас назову вашему тайному санте.')
+    update.message.reply_text('Как мне вас называть? Пишите с умом, по этому имени я вас назову вашему тайному санте. Не советую на этом моменте /cancel нажимать, но советую это сделать если вас нету в списке и вы пропустили заполнение вишлиста.')
 
     return NAME
 
@@ -138,7 +131,7 @@ def shuffle(update: Update, context: CallbackContext) -> int:
     reply_keyboard = [['Да', 'Нет']]
 
     update.message.reply_text(
-        'Надо выбрать чят где все могут увидеть что я шафлю...\n',
+        'Надо выбрать чят где все могут увидеть что я шафлю...\nВ любой момент вы можете вызвать команду /cancel чтобы остановить команду.',
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True, input_field_placeholder='В этом чате распределять?'
         ),
@@ -196,8 +189,6 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
 
     conn.commit()
 
-    update.message.reply_text('Готово!')
-
     cur.execute("""select m.username, m.name, m.wishlist
                     from shuffle as s
                     inner JOIN main as m
@@ -207,6 +198,8 @@ def shuffle_handler(update: Update, context: CallbackContext) -> int:
     for element in data:
         context.bot.send_message(chat_id=element[0], text=f"Ты тайный Санта этого человека: {element[1]} (username: {element[0]}) и он/онa хочет: {element[2]}")
 
+    update.message.reply_text('Готово!')
+
     return ConversationHandler.END
 
 
@@ -215,7 +208,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text(
-        'Пока!', reply_markup=ReplyKeyboardRemove()
+        'Отменяю...', reply_markup=ReplyKeyboardRemove()
     )
 
     return ConversationHandler.END
@@ -250,7 +243,8 @@ def main():
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('update_wishlist', update_wishlist)],
                                        states={
-                                           UPDATE_WISHLIST: [MessageHandler(Filters.text, update_wishlist_handler)],
+                                           UPDATE_WISHLIST: [CommandHandler('cancel', cancel),
+                                                             MessageHandler(Filters.text, update_wishlist_handler)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
                                        ))
@@ -259,17 +253,21 @@ def main():
                                        states={
                                            WISHLIST: [
                                                       CommandHandler('skip', skip_wishlist),
-                                                      CommandHandler('cancel', cancel_wishlist),
+                                                      CommandHandler('cancel', cancel),
                                                       MessageHandler(Filters.text, wishlist_handler), 
                                                       ],
-                                           NAME: [MessageHandler(Filters.text, define_name)],
+                                           NAME: [CommandHandler('cancel', cancel),
+                                                  MessageHandler(Filters.text, define_name)],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
                                        ))
     dp.add_handler(ConversationHandler(
                                        entry_points=[CommandHandler('shuffle', shuffle)],
                                        states={
-                                           SHUFFLE: [MessageHandler(Filters.chat(mc_id), shuffle_handler)],
+                                           SHUFFLE: [
+                                               CommandHandler('cancel', cancel),
+                                               MessageHandler(Filters.chat(mc_id), shuffle_handler)
+                                               ],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
                                        ))
