@@ -58,7 +58,7 @@ def delete_me(update: Update, context: CallbackContext) -> int:
 
 def update_wishlist(update: Update, context: CallbackContext) -> int:
 
-    update.message.reply_text('Что ты хочешь от Санты? В любой момент вы можете вызвать команду /cancel чтобы остановить команду.')
+    update.message.reply_text('Что ты хочешь от Санты? В любой момент вы можете вызвать /cancel чтобы остановить команду.')
 
     return UPDATE_WISHLIST
 
@@ -76,7 +76,7 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
 def wishlist(update: Update, context: CallbackContext) -> int:
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? В любой момент вы можете вызвать команду /cancel чтобы остановить команду. Если хотите оставить вишлист таким же, но хотите поменять имя напишите команду /skip.")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? В любой момент вы можете вызвать /cancel чтобы остановить команду. Если хотите оставить вишлист таким же, но хотите поменять имя напишите команду /skip.")
 
     return WISHLIST
 
@@ -131,7 +131,7 @@ def shuffle(update: Update, context: CallbackContext) -> int:
     reply_keyboard = [['Да', 'Нет']]
 
     update.message.reply_text(
-        'Надо выбрать чят где все могут увидеть что я шафлю...\nВ любой момент вы можете вызвать команду /cancel чтобы остановить команду.',
+        'Надо выбрать чят где все могут увидеть что я шафлю...\nВ любой момент вы можете вызвать /cancel чтобы остановить команду.',
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True, input_field_placeholder='В этом чате распределять?'
         ),
