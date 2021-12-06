@@ -28,7 +28,7 @@ WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 
 
 def start(update, context):
-    """Send a message when the command /start is issued."""
+    """Send a message when the command /start is issued"""
     update.message.reply_text('Хаю-хай!!')
 
 
@@ -76,7 +76,7 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
 def wishlist(update: Update, context: CallbackContext) -> int:
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? Если нажали по ошибке или передумали напишите /skip")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что желаете? Если нажали по ошибке или передумали напишите /skip или /cancel чтобы остановить команду.")
 
     return WISHLIST
 
@@ -86,6 +86,13 @@ def skip_wishlist(update: Update, context: CallbackContext) -> int:
     update.message.reply_text('Понял! Тогда как мне вас называть? Пишите с умом, по этому имени я вас назову вашему тайному санте.')
 
     return NAME
+
+
+def cancel_wishlist(update: Update, context: CallbackContext) -> int:
+
+    update.message.reply_text('Отменяю...')
+
+    return ConversationHandler.END
 
 
 def wishlist_handler(update: Update, context: CallbackContext) -> int:
@@ -252,6 +259,7 @@ def main():
                                        states={
                                            WISHLIST: [
                                                       CommandHandler('skip', skip_wishlist),
+                                                      CommandHandler('cancel', cancel_wishlist),
                                                       MessageHandler(Filters.text, wishlist_handler), 
                                                       ],
                                            NAME: [MessageHandler(Filters.text, define_name)],
