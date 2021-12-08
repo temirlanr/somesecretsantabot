@@ -109,7 +109,7 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
 
     try:
         cur.execute(f"SELECT user_id FROM shuffle WHERE is_santa_for={user.id};")
-        santa_id = conn.fetchall()
+        santa_id = cur.fetchall()
         
         context.bot.send_message(chat_id=340212781, text=f"id santy={santa_id}, Новый вишлист! \n{update.message.text}")
     except Exception:
