@@ -13,7 +13,6 @@ import logging
 import os
 import psycopg2
 import random
-# import string / TEST
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
@@ -32,8 +31,7 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 
-mc_id = -1001239998681
-# table_names = {} / TEST
+# table_names = {}
 
 WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 # Define a few command handlers. These usually take the two arguments update and
@@ -45,19 +43,29 @@ def start(update, context):
     update.message.reply_text('Хаю-хай!!')
 
 
-# def set_as_main(update: Update, context: CallbackContext): / TEST
+# def set_as_main(update: Update, context: CallbackContext):
 
 #     global mc_id
 #     mc_id = update.effective_chat.id
-#     ran = ''.join(random.choices(string.ascii_lowercase + string.digits, k = 10))
-#     table_names[str(mc_id)] = ran
+#     main_table = f"main{str(mc_id).replace('-','')}"
+#     shuffle_table = f"shuffle{str(mc_id).replace('-','')}"
+#     group_users = f"users{str(mc_id).replace('-','')}"
+#     table_names[str(mc_id)] = [main_table, shuffle_table, group_users]
 
 #     if str(mc_id) in table_names:
 #         update.message.reply_text('Этот чат уже зарегистрирован')
 #     else:
-#         cur.execute(f"CREATE TABLE {ran}_main;")
-#         cur.execute(f"CREATE TABLE {ran}_shuffle;")
+#         cur.execute(f"CREATE TABLE {main_table};")
+#         cur.execute(f"CREATE TABLE {shuffle_table};")
+#         cur.execute(f"CREATE TABLE {group_users};")
 #         conn.commit()
+
+    
+# def register(update: Update, context: CallbackContext):
+    
+#     user = update.effective_chat.username
+    
+#     update.message.reply_text(f"{user}")
 
 
 def list(update: Update, context: CallbackContext):
@@ -294,7 +302,7 @@ def main():
                                        states={
                                            SHUFFLE: [
                                                CommandHandler('cancel', cancel),
-                                               MessageHandler(Filters.chat(mc_id), shuffle_handler)
+                                               MessageHandler(Filters.text, shuffle_handler)
                                                ],
                                        },
                                        fallbacks=[CommandHandler('cancel', cancel)],
