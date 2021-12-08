@@ -31,7 +31,8 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 
-# table_names = {}
+mc_id = -781804237
+# table_names = {} / TEST
 
 WISHLIST, NAME, SHUFFLE, CONFIRMATION, UPDATE_WISHLIST = range(5)
 # Define a few command handlers. These usually take the two arguments update and
