@@ -11,6 +11,7 @@ TO DO:
 
 import logging
 import os
+from typing import Text
 import psycopg2
 import random
 
@@ -105,6 +106,14 @@ def update_wishlist_handler(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     cur.execute(f"UPDATE main SET wishlist='{update.message.text}' WHERE user_id={user.id};")
     conn.commit()
+
+    try:
+        cur.execute(f"SELECT user_id FROM shuffle WHERE is_santa_for={user.id};")
+        santa_id = conn.fetchall()
+        
+        context.bot.send_message(chat_id=santa_id, text=f"Новый вишлист! \n{update.message.text}")
+    except Exception:
+        update.message.reply_text('Ошибка....')
 
     update.message.reply_text('Понял!')
 
